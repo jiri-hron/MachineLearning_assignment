@@ -4,38 +4,37 @@ Sunday, August 17, 2014
 
 # Synopsis
 
-This paper was written as course assignment for Coursera's class __Practical
-Machine Learning__. Main goal of this assignment was to develop a predictive
+This paper was written as a course assignment for Coursera's class __Practical
+Machine Learning__. Main goal of this assignment was to develop a statistical
 model, which would be able to predict type of physical exercise being performed
-by experiment participants based on the data collected from wearable motorical
+by experiment participants based on the data collected from wearable motion
 sensors attached to their bodies. In the following parts, a short description
-of what preprocessing was used to the original data is given, followed by
-elementary exploratory analysis. Last two chapters are then describing how
-the final model was designed and picked, and out-of-sample estimate of 
-the algorithm accuracy is provided.
+of what pre-processing was used is given, followed by an elementary exploratory analysis. Last two chapters are then describing how the final model was
+designed and providing out-of-sample estimate of the algorithm's accuracy.
 
-# Data preprocessing
+# Data pre-processing
 
 
 
 Data set used for this assignment was obtained as a subset of original
-data [here][1]. Before approaching model
-design, descriptive variables (*X*, *user_name*, *raw_timestamp_part_1*, 
-*raw_timestamp_part_2*, *cvtd_timestamp*) and records containing aggregate
-statistics for larger time window of previous rows in the data set (identified
-by variable value `new_window == "yes"`) were removed.  
+data [here][1]. Before approaching a model design, descriptive variables
+(*X*, *user_name*, *raw_timestamp_part_1*, *raw_timestamp_part_2*,
+*cvtd_timestamp*) and records containing aggregate statistics for larger time
+window of previous rows in the data set (identified by variable value
+`new_window == "yes"`) were removed.  
 
 All remaining variables were tested for completeness, i.e. if there is at least
 one valid value in the whole data set. Even this weak criterion and previously
 described steps reduced variable column space from 160 to 53
-(resp. from 159 to 52 if counting off `classe`).
+dimensions (resp. from 159 to 52 if not response variable
+`classe`).
 
 Full data set of 19216 variables was divided into train and test sets,
 with relative sizes of 0.75 and 0.25 for
 both sets respectively.  
 
-For purpose of exploratory analysis and model fitting, three versions of feature
-model were prepared:  
+For purpose of exploratory analysis and model fitting, three versions of
+model matrices were prepared:  
 
   1. **raw** - no transformation, original values  
   2. **normalized** - features were scaled and centered  
@@ -44,9 +43,9 @@ model were prepared:
 
 # Data exploration
 
-Before exploration of sample space, we need to assure that our predicted 
+Before exploration of sample space, we need to assure that our outcome 
 variable `classe` (type of the activity being performed) is approximately
-distributed or at least doesn't contain any very rare classes:
+uniformly distributed or at least doesn't contain any very rare classes:
 
 
 ```
@@ -118,18 +117,18 @@ were identified:
 
 Since our feature space is still 52-dimensional, we will use pca
 transformation to get a basic insight into the aggregate information contained
-in the data set. As already mentioned in previous text, principal components
-were chosen as such to preserve 95% of the variance in the data, which yielded
-27 principal directions. Even projection of data to
-the first two of them shows separation of data into 5 subgroups. However, this
-discernible pattern does not correspond to a distribution of `classe` variable
-pictured by color of the points.
+in the training set. As already mentioned in previous text, principal components
+were chosen in such way to preserve 95% of the variance in the data, which
+yielded a total number of 27 principal directions.
+Projection of data to the first two of them shows separation of data into
+5 subgroups. However, this discernible pattern does not correspond to 
+a distribution of `classe` variable pictured by color of the points.
 
 ![First two principal components](./report_files/figure-html/unnamed-chunk-4.png) 
 
 If we involve the third principal component, we could see that clusters from
-previous figure are forming oblong clusters on the next figure (third principal
-component is on vertical axis).
+previous figure are forming oblong shapes on the next figure (third principal
+component is added as a vertical axis).
 
 ![First three principal components](./report_files/figure-html/unnamed-chunk-5.png) 
 
@@ -158,20 +157,20 @@ their absolute value:
 # Prediction model development
 
 Purpose of following paragraphs is to design a best possible model, where best
-means with highest prediction **accuracy**.
+means with highest prediction `Accuracy`.
 
 ## Design
 
 
 
-In the beginning we started by fitting two types of models, namely:
+We started by fitting two types of models, namely:
 
 * Robust Regularized Linear Discriminant Analysis
 * Support Vector Machines with RBF (Gaussian) Kernel
 
 The former of those two models represents an algorithm preferring bias over
-variance while using only linear fit, the latter one is on the contrary able
-to fit more general types of non-linear relationships between variables and
+variance since it is using only linear fit, the latter one is on the contrary 
+able to fit more general types of non-linear relationships between variables and
 thus might tend to prefer variance. However both can be tuned by user provided
 parameters, which can regularize the fit (increasing $\lambda$ for rrlda,
 decreasing __C__ for SVM) or improve its flexibility (increasing __C__ for SVM,
@@ -187,13 +186,13 @@ candidate tuning parameters during cross-validation. Method used to rule-out
 futile models used was the default one for _trainControl_ function used by
 _caret_, which uses generalized least squares as a measure of each tuning
 parameter's value "fruitfulness" and gets rid of any set of tuning parameters
-that have significantly worse cv-error, than that of the best model at given
+that have significantly worse CV-error, than that of the best model at given
 iteration (one-sided hypothesis test on 95% significant level was used to
-determine such models). Finally, first 5 cv-iterations were performed with
-full set of potential tuning parameters and reduction of candidate parameters
-was carried out at every following iteration, using average model error from
-all preceding iterations (refer to original paper for more details about
-this method).  
+determine such models). First 5 CV-iterations were performed with
+full set of potential tuning parameters. Reduction of total number of candidate 
+parameters was carried out at every following iteration, using average model 
+error from all preceding iterations (refer to original paper for more details
+about this method).  
 Additional tuning parameters used for rrlda:
 
 
@@ -210,12 +209,12 @@ Additional tuning parameters used for rrlda:
 ## 9  30.00 0.75      L2
 ```
 
-The `hp` parameter is specifying proportion of available training examples
-which should be used for model fitting (robustness parameter), `penalty` is 
-type of the penalty to be used (we used L2 penalty which is more suitable
-for environments where most of the predictors - in our cas pca transforms - are
-expected to be significant predictors). $\lambda$ is then the regularization
-parameter which we tried to find by by cross-validation.  
+The `hp` parameter is specifying proportion of available training examples for
+model fitting which should be used for model fitting (robustness parameter),
+`penalty` istype of the penalty to be used (we used L2 penalty which is more
+suitable for environments where most of the predictors - in our case pca 
+transforms - are expected to be significant predictors). $\lambda$ is 
+the regularization parameter which we tried to find by cross-validation.  
 
 Additional tuning parameters used for SVM:
 
@@ -325,9 +324,9 @@ with parameters ($\lambda$,hp,penalty) = (0.01, 0.75, L2).
 ## Balanced Accuracy       0.783   0.6652    0.665    0.673    0.826
 ```
 
-As you can see, SVM model has superior test error estimate and since its value
+SVM model has shown a superior test error estimate and since its value
 is very close to absolute optimum, there is no need for further tuning.  
-`Accuracy` estimation for SVM model is also our estimate for out-of-sample
+`Accuracy` estimation for SVM model is also our final estimate for out-of-sample
 error.
 
 [1]: http://groupware.les.inf.puc-rio.br/har
