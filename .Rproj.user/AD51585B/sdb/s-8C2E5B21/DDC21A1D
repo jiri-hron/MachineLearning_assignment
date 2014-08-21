@@ -1,0 +1,17 @@
+{
+    "contents" : "- focus of the paper was not only to recognize, but to assess how well\nan activity was performed\n\n- For feature extraction we used a sliding window approach\nwith different lengths from 0.5 second to 2.5 seconds, with\n0.5 second overlap\n\n- In each step of the sliding window approach\nwe calculated features on the Euler angles (roll, pitch\nand yaw), as well as the raw accelerometer, gyroscope and\nmagnetometer readings.\nhttp://en.wikipedia.org/wiki/Euler_angles\n\n- ",
+    "created" : 1408267559087.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "556958568",
+    "id" : "DDC21A1D",
+    "lastKnownWriteTime" : 1408268810,
+    "path" : "C:/Users/IBM_ADMIN/Desktop/education/academicworld/data_science/practical_ml/project/original_paper-notes.txt",
+    "project_path" : "original_paper-notes.txt",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "text"
+}
